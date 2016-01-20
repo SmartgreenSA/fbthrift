@@ -80,5 +80,5 @@ setup(name = 'thrift',
         'thrift.server',
         'thrift.util',
       ],
-      package_dir = {'thrift' : 'src'}
+      package_dir = {'thrift' : 'thrift'}
       )
