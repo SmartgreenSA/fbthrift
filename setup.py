@@ -80,5 +80,8 @@ setup(name = 'thrift',
         'thrift.server',
         'thrift.util',
       ],
-      package_dir = {'thrift' : 'thrift'}
+      package_dir = {'thrift' : 'thrift'},
+      install_requires = [
+        'gevent', 'greenlet'
+      ]
       )
