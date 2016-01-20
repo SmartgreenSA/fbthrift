@@ -50,7 +50,7 @@ class build_ext(_build_ext):
 
 fastprotomod = Extension(
     'thrift.protocol.fastproto',
-    sources = ['protocol/fastproto.cpp'],
+    sources = ['src/protocol/fastproto.cpp'],
     libraries=['thriftcpp2', 'folly'],
     extra_compile_args=['-std=c++0x'],
     optional=True,
@@ -60,7 +60,7 @@ version_info = sys.version_info
 boost_python = "boost_python-py{}{}".format(version_info[0], version_info[1])
 cppservermod = Extension(
     'thrift.server.CppServerWrapper',
-    sources = ['server/CppServerWrapper.cpp'],
+    sources = ['src/server/CppServerWrapper.cpp'],
     libraries=[boost_python, 'thriftcpp2', 'folly', 'wangle'],
     extra_compile_args=['-std=c++0x', '-fno-strict-aliasing'],
     optional=True,
@@ -80,7 +80,5 @@ setup(name = 'thrift',
         'thrift.server',
         'thrift.util',
       ],
-      package_dir = {'thrift' : '.'},
-      ext_modules = [fastprotomod, cppservermod],
-      cmdclass={'build_ext': build_ext},
+      package_dir = {'thrift' : 'src'}
       )

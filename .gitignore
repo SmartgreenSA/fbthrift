@@ -1,1 +1,3 @@
 *.pyc
+build/
+thrift.egg-info/
