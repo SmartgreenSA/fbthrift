@@ -111,7 +111,7 @@ class TCompactProtocol(TProtocolBase):
     "Compact implementation of the Thrift protocol driver."
 
     PROTOCOL_ID = 0x82
-    VERSION = 2
+    VERSION = 1
     VERSION_LOW = 1
     VERSION_DOUBLE_BE = 2
     VERSION_MASK = 0x1f
