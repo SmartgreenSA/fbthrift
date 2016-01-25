@@ -45,12 +45,13 @@ class TGeventServer(TServer):
     Written by Dvir Volk, doat.com
     """
 
-    def __init__(self, port, *args):
+    def __init__(self, log, port, *args):
         TServer.__init__(self, *args)
         self.port = port
         self.numWorkers = multiprocessing.cpu_count()
         self.workers = []
         self.postForkCallback = None
+        self.logger = logging.getLogger(log) if log else logging
 
     def setPostForkCallback(self, callback):
         if not isinstance(callback, collections.Callable):
@@ -65,7 +66,7 @@ class TGeventServer(TServer):
         """Process input/output from a client for as long as possible"""
         client = TSocket()
         client.setHandle(socket)
-        peerName = client.getPeerName()
+        self.peerName = client.getPeerName()
 
         itrans = self.inputTransportFactory.getTransport(client)
         otrans = self.outputTransportFactory.getTransport(client)
@@ -77,12 +78,12 @@ class TGeventServer(TServer):
 
         try:
             while True:
-                self.processor._handler.peerName = peerName
+                self.processor._handler.peerName = self.peerName
                 self.processor.process(iprot, oprot)
         except TTransportException as tx:
             pass
         except Exception as x:
-            logging.exception(x)
+            self.logger.error('[%s]', x, extra={'clientip':self.peerName})
 
         itrans.close()
         otrans.close()
@@ -96,7 +97,7 @@ class TGeventServer(TServer):
             except (KeyboardInterrupt, SystemExit):
                 return 0
             except Exception as x:
-                logging.exception(x)
+                self.logger.error('[%s]', x, extra={'clientip':self.peerName})
 
     def serve(self, listener=None):
         """Start a fixed number of worker threads and put client into a queue"""
