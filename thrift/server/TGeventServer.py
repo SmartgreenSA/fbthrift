@@ -33,6 +33,7 @@ from .TServer import TServer
 from thrift.transport.TTransport import TTransportException
 from thrift.transport.TSocket import TSocket
 from thrift.protocol.THeaderProtocol import THeaderProtocolFactory
+from threading import current_thread
 
 from gevent import monkey
 monkey.patch_all(select=False)
@@ -67,6 +68,7 @@ class TGeventServer(TServer):
         client = TSocket()
         client.setHandle(socket)
         self.peerName = client.getPeerName()
+        thread_info = current_thread()
 
         itrans = self.inputTransportFactory.getTransport(client)
         otrans = self.outputTransportFactory.getTransport(client)
@@ -78,12 +80,15 @@ class TGeventServer(TServer):
 
         try:
             while True:
-                self.processor._handler.peerName = self.peerName
+                if isinstance(getattr(self.processor._handler, 'peerName', None), dict):
+                    self.processor._handler.peerName[thread_info] = client.getPeerName()
+                else:
+                    self.processor._handler.peerName = {thread_info: client.getPeerName()}
                 self.processor.process(iprot, oprot)
         except TTransportException as tx:
             pass
         except Exception as x:
-            self.logger.error('[%s]', x, extra={'clientip':self.peerName})
+            self.logger.error('[%s]', x, extra={'clientip': client.getPeerName()})
 
         itrans.close()
         otrans.close()
