@@ -82,6 +82,6 @@ setup(name = 'thrift',
       ],
       package_dir = {'thrift' : 'thrift'},
       install_requires = [
-        'gevent', 'greenlet'
+        'gevent==1.1.1', 'greenlet==0.4.9'
       ]
       )
